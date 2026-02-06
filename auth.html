@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerStar - Login & Register</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form {
+            display: none;
+        }
+
+        .form.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ PowerStar</h1>
+            <p>Welcome to PowerStar Platform</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('login')">Login</div>
+            <div class="tab" onclick="switchTab('register')">Register</div>
+        </div>
+
+        <div class="form-container">
+            <!-- Alert Messages -->
+            <div id="alert" class="alert"></div>
+
+            <!-- Loading Spinner -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #666;">Processing...</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="form active" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginNumber">Phone Number</label>
+                    <input type="tel" id="loginNumber" placeholder="03001234567" 
+                           pattern="[0-9]{10,11}" required>
+                    <div class="helper-text">Enter your 10 or 11 digit phone number</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" placeholder="Enter your name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerNumber">Phone Number</label>
+                    <input type="tel" id="registerNumber" placeholder="03001234567" 
+                           pattern="[0-9]{10,11}" required>
+                    <div class="helper-text">This will be your login username</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" placeholder="Create a password" 
+                           minlength="6" required>
+                    <div class="helper-text">Minimum 6 characters</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerReferral">Referral Code (Optional)</label>
+                    <input type="text" id="registerReferral" placeholder="Enter referral code">
+                </div>
+
+                <button type="submit" class="btn">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============ CONFIG ============
+        // اپنا Web App URL یہاں paste کریں
+        const API_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+        
+        // ============ UTILITIES ============
+        function showAlert(message, type = 'error') {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+
+        function showLoading(show = true) {
+            const loading = document.getElementById('loading');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            if (show) {
+                loading.classList.add('show');
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'none';
+            } else {
+                loading.classList.remove('show');
+                switchTab(document.querySelector('.tab.active').textContent.toLowerCase());
+            }
+        }
+
+        function switchTab(tab) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event?.target?.classList.add('active') || 
+                document.querySelector(`.tab:nth-child(${tab === 'login' ? 1 : 2})`).classList.add('active');
+            
+            // Update forms
+            document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+            document.getElementById(tab + 'Form').classList.add('active');
+            
+            // Clear alert
+            document.getElementById('alert').classList.remove('show');
+        }
+
+        function saveSession(token, user) {
+            localStorage.setItem('powerstar_token', token);
+            localStorage.setItem('powerstar_user', JSON.stringify(user));
+        }
+
+        function getDeviceToken() {
+            let token = localStorage.getItem('powerstar_device_token');
+            if (!token) {
+                token = 'device_' + Math.random().toString(36).substr(2, 9) + Date.now();
+                localStorage.setItem('powerstar_device_token', token);
+            }
+            return token;
+        }
+
+        // ============ API CALLS ============
+        async function callAPI(action, data) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action, ...data })
+                });
+
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                return { ok: false, error: 'Network error. Please check your connection.' };
+            }
+        }
+
+        // ============ HANDLERS ============
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const number = document.getElementById('loginNumber').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const deviceToken = getDeviceToken();
+
+            if (!number || !password) {
+                showAlert('Please fill all fields');
+                return;
+            }
+
+            showLoading(true);
+
+            const result = await callAPI('login', {
+                number,
+                password,
+                device_token: deviceToken
+            });
+
+            showLoading(false);
+
+            if (result.ok) {
+                saveSession(result.token, result.user);
+                showAlert('Login successful! Redirecting...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            } else {
+                showAlert(result.error || 'Login failed');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value.trim();
+            const number = document.getElementById('registerNumber').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const referral = document.getElementById('registerReferral').value.trim();
+            const deviceToken = getDeviceToken();
+
+            if (!name || !number || !password) {
+                showAlert('Please fill all required fields');
+                return;
+            }
+
+            if (password.length < 6) {
+                showAlert('Password must be at least 6 characters');
+                return;
+            }
+
+            showLoading(true);
+
+            const result = await callAPI('register', {
+                name,
+                number,
+                password,
+                referral,
+                device_token: deviceToken
+            });
+
+            showLoading(false);
+
+            if (result.ok) {
+                showAlert('Registration successful! Please login.', 'success');
+                
+                // Clear form
+                document.getElementById('registerForm').reset();
+                
+                // Switch to login tab
+                setTimeout(() => {
+                    switchTab('login');
+                    document.getElementById('loginNumber').value = number;
+                }, 2000);
+            } else {
+                showAlert(result.error || 'Registration failed');
+            }
+        }
+
+        // ============ CHECK IF ALREADY LOGGED IN ============
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('powerstar_token');
+            if (token) {
+                // Verify token
+                callAPI('me', { token }).then(result => {
+                    if (result.ok) {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        // Clear invalid token
+                        localStorage.removeItem('powerstar_token');
+                        localStorage.removeItem('powerstar_user');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
